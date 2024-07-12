@@ -1,0 +1,6 @@
+services:
+  transaction-service:
+    image: transaction-service:1.0-SNAPSHOT
+    ports:
+      - 8080:8080
+    restart: always
