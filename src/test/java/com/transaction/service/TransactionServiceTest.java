@@ -1,14 +1,15 @@
 package com.transaction.service;
 
 import com.transaction.api.dto.TransactionDto;
+import com.transaction.repository.TransactionRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.boot.test.mock.mockito.SpyBean;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import java.util.ArrayList;
+import java.math.BigDecimal;
+import java.time.ZonedDateTime;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -21,22 +22,19 @@ public class TransactionServiceTest {
     
     private TransactionService subjectUnderTest;
 
-    @SpyBean
-    ArrayList<TransactionDto> transactionStorage;
-
-    private TransactionDto transactionDto;
+    @MockBean
+    TransactionRepository transactionRepository;
 
     @Before
     public void setUp() {
-//        subjectUnderTest = new TransactionService(transactionStorage);
+        subjectUnderTest = new TransactionService(transactionRepository);
     }
 
     @Test
     public void checkTransactionTimeInFutureReturnsTrue(){
-/*        transactionStorage.clear();
-        transactionDto = new TransactionDto(new BigDecimal("12.3343"), ZonedDateTime.now().plusHours(1L));
+        TransactionDto transactionDto = new TransactionDto(new BigDecimal("12.3343"), ZonedDateTime.now().plusHours(1L));
 
-        assertThat(subjectUnderTest.checkTransactionTimeInFuture(transactionDto)).isTrue();*/
+        assertThat(subjectUnderTest.checkTransactionTimeInFuture(transactionDto)).isTrue();
     }
 
 /*    @Test
