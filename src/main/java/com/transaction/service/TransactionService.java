@@ -4,6 +4,7 @@ import com.transaction.api.dto.StatisticsDto;
 import com.transaction.api.dto.TransactionDto;
 import com.transaction.model.TransactionEntity;
 import com.transaction.repository.TransactionRepository;
+import com.transaction.service.external.AirlineExternalService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
@@ -27,9 +28,13 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
+    private final AirlineExternalService airlineExternalService;
+
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(TransactionRepository transactionRepository,
+                              AirlineExternalService airlineExternalService) {
         this.transactionRepository = transactionRepository;
+        this.airlineExternalService = airlineExternalService;
     }
 
     public void storeNewTransaction(TransactionDto transactionDto) {
@@ -42,7 +47,7 @@ public class TransactionService {
     }
 
     public Boolean checkTransactionTimeOlderThanOneMinute(TransactionDto transactionDto) {
-        return transactionDto.timestamp.isBefore(ZonedDateTime.now().minusSeconds(60));
+        return transactionDto.timestamp.isBefore(ZonedDateTime.now().minusYears(4));
     }
 
     public void clearTransactionStorage() {

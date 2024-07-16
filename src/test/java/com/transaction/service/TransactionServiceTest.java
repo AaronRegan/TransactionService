@@ -2,6 +2,7 @@ package com.transaction.service;
 
 import com.transaction.api.dto.TransactionDto;
 import com.transaction.repository.TransactionRepository;
+import com.transaction.service.external.AirlineExternalService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,9 +26,12 @@ public class TransactionServiceTest {
     @MockBean
     TransactionRepository transactionRepository;
 
+    @MockBean
+    AirlineExternalService airlineExternalService;
+
     @Before
     public void setUp() {
-        subjectUnderTest = new TransactionService(transactionRepository);
+        subjectUnderTest = new TransactionService(transactionRepository, airlineExternalService);
     }
 
     @Test
