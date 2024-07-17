@@ -26,12 +26,9 @@ public class TransactionServiceTest {
     @MockBean
     TransactionRepository transactionRepository;
 
-    @MockBean
-    AirlineExternalService airlineExternalService;
-
     @Before
     public void setUp() {
-        subjectUnderTest = new TransactionService(transactionRepository, airlineExternalService);
+        subjectUnderTest = new TransactionService(transactionRepository);
     }
 
     @Test

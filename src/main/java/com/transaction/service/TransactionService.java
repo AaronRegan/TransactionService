@@ -28,13 +28,9 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
-    private final AirlineExternalService airlineExternalService;
-
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository,
-                              AirlineExternalService airlineExternalService) {
+    public TransactionService(TransactionRepository transactionRepository) {
         this.transactionRepository = transactionRepository;
-        this.airlineExternalService = airlineExternalService;
     }
 
     public void storeNewTransaction(TransactionDto transactionDto) {
@@ -47,7 +43,7 @@ public class TransactionService {
     }
 
     public Boolean checkTransactionTimeOlderThanOneMinute(TransactionDto transactionDto) {
-        return transactionDto.timestamp.isBefore(ZonedDateTime.now().minusYears(4));
+        return transactionDto.timestamp.isBefore(ZonedDateTime.now().minusSeconds(60));
     }
 
     public void clearTransactionStorage() {
