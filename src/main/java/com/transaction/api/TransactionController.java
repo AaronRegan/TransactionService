@@ -3,6 +3,8 @@ package com.transaction.api;
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 import com.transaction.api.dto.StatisticsDto;
 import com.transaction.api.dto.TransactionDto;
+import com.transaction.api.dto.TransactionMapper;
+import com.transaction.model.TransactionEntity;
 import com.transaction.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,20 +28,26 @@ public class TransactionController {
     @NonNull
     private final TransactionService transactionService;
 
+    @NonNull
+    private final TransactionMapper transactionMapper;
+
     @Autowired
-    public TransactionController(@NonNull final TransactionService transactionService) {
+    public TransactionController(@NonNull final TransactionService transactionService,
+                                 @NonNull final TransactionMapper transactionMapper) {
         this.transactionService = transactionService;
+        this.transactionMapper = transactionMapper;
     }
 
     @PostMapping("/transactions")
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<String> postTransaction(@RequestBody @Valid TransactionDto transactionDto) {
-        if (transactionService.checkTransactionTimeInFuture(transactionDto)) {
+        TransactionEntity incomingTransaction = transactionMapper.dtoToEntity(transactionDto);
+        if (transactionService.checkTransactionTimeInFuture(incomingTransaction)) {
             return new ResponseEntity<>("", HttpStatus.UNPROCESSABLE_ENTITY);
-        } else if (transactionService.checkTransactionTimeOlderThanOneMinute(transactionDto)) {
+        } else if (transactionService.checkTransactionTimeOlderThanOneMinute(incomingTransaction)) {
             return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
         } else {
-            transactionService.storeNewTransaction(transactionDto);
+            transactionService.storeNewTransaction(incomingTransaction);
             return new ResponseEntity<>("", HttpStatus.CREATED);
         }
     }

@@ -33,17 +33,17 @@ public class TransactionService {
         this.transactionRepository = transactionRepository;
     }
 
-    public void storeNewTransaction(TransactionDto transactionDto) {
-        log.debug("Received New Transaction {}", transactionDto.toString());
-        transactionRepository.save(this.dtoToEntity(transactionDto));
+    public void storeNewTransaction(TransactionEntity transactionEntity) {
+        log.debug("Received New Transaction {}", transactionEntity.toString());
+        transactionRepository.save(transactionEntity);
     }
 
-    public Boolean checkTransactionTimeInFuture(TransactionDto transactionDto) {
-        return transactionDto.timestamp.isAfter(ZonedDateTime.now());
+    public Boolean checkTransactionTimeInFuture(TransactionEntity transactionEntity) {
+        return transactionEntity.timestamp.isAfter(ZonedDateTime.now());
     }
 
-    public Boolean checkTransactionTimeOlderThanOneMinute(TransactionDto transactionDto) {
-        return transactionDto.timestamp.isBefore(ZonedDateTime.now().minusSeconds(60));
+    public Boolean checkTransactionTimeOlderThanOneMinute(TransactionEntity transactionEntity) {
+        return transactionEntity.timestamp.isBefore(ZonedDateTime.now().minusSeconds(60));
     }
 
     public void clearTransactionStorage() {
@@ -54,9 +54,8 @@ public class TransactionService {
     public StatisticsDto getTransactionstatisticsForLast60Seconds() {
         BigDecimalSummaryStatistics stats = transactionRepository.findAll()
                 .stream()
-                .map(this::entityToDto)
-                .filter(transactionDto -> !this.checkTransactionTimeOlderThanOneMinute(transactionDto))
-                .collect(Collectors2.summarizingBigDecimal(TransactionDto::getAmount));
+                .filter(transactionEntity -> !this.checkTransactionTimeOlderThanOneMinute(transactionEntity))
+                .collect(Collectors2.summarizingBigDecimal(TransactionEntity::getAmount));
 
         // The Integration Tests Expect String output for the statistics
         return new StatisticsDto(
@@ -72,13 +71,5 @@ public class TransactionService {
         log.info("Transaction Storage size Before clean up: {}", transactionRepository.findAll().size());
         this.transactionRepository.deleteIfOlderThanTimestamp(ZonedDateTime.now().minusSeconds(60L));
         log.info("Transaction Storage size after clean up: {}", transactionRepository.findAll().size());
-    }
-
-    private TransactionDto entityToDto(TransactionEntity transactionEntity) {
-        return new TransactionDto(transactionEntity.getAmount(), transactionEntity.getTimestamp());
-    }
-
-    private TransactionEntity dtoToEntity(TransactionDto transactionDto) {
-        return new TransactionEntity(transactionDto.getAmount(), transactionDto.getTimestamp());
     }
 }
