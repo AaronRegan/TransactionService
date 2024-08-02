@@ -1,7 +1,9 @@
 package com.transaction.service;
 
-import com.transaction.domain.TransactionEntity;
+import com.transaction.model.TransactionEntity;
 import com.transaction.repository.TransactionRepository;
+import com.transaction.service.dto.TransactionDto;
+import com.transaction.service.dto.mapper.TransactionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,37 +28,40 @@ public class TransactionServiceTest {
     @MockBean
     TransactionRepository transactionRepository;
 
+    @MockBean
+    TransactionMapper transactionMapper;
+
     @Before
     public void setUp() {
-        subjectUnderTest = new TransactionService(transactionRepository);
+        subjectUnderTest = new TransactionService(transactionRepository, transactionMapper);
     }
 
     @Test
     public void checkTransactionTimeInFutureReturnsTrue(){
-        TransactionEntity transactionEntity = new TransactionEntity(new BigDecimal("12.3343"), ZonedDateTime.now().plusHours(1L));
+        TransactionDto transactionDto = new TransactionDto(new BigDecimal("12.3343"), ZonedDateTime.now().plusHours(1L));
 
-        assertThat(subjectUnderTest.checkTransactionTimeInFuture(transactionEntity)).isTrue();
+        assertThat(subjectUnderTest.checkTransactionTimeInFuture(transactionDto)).isTrue();
     }
 
     @Test
     public void checkTransactionTimeInFutureReturnsFalse(){
-        TransactionEntity transactionEntity = new TransactionEntity(new BigDecimal("12.3343"), ZonedDateTime.now().minusSeconds(2L));
+        TransactionDto transactionDto = new TransactionDto(new BigDecimal("12.3343"), ZonedDateTime.now().minusSeconds(2L));
 
-        assertThat(subjectUnderTest.checkTransactionTimeInFuture(transactionEntity)).isFalse();
+        assertThat(subjectUnderTest.checkTransactionTimeInFuture(transactionDto)).isFalse();
     }
 
     @Test
     public void checkTransactionTimeIsOlderThan60SecondsTrue(){
-        TransactionEntity transactionEntity = new TransactionEntity(new BigDecimal("12.3343"), ZonedDateTime.now().minusSeconds(59L));
+        TransactionDto transactionDto = new TransactionDto(new BigDecimal("12.3343"), ZonedDateTime.now().minusSeconds(59L));
 
-        assertThat(subjectUnderTest.checkTransactionTimeOlderThanOneMinute(transactionEntity)).isFalse();
+        assertThat(subjectUnderTest.checkTransactionTimeOlderThanOneMinute(transactionDto)).isFalse();
     }
 
     @Test
     public void checkTransactionTimeIsOlderThan60SecondsFalse(){
-        TransactionEntity transactionEntity = new TransactionEntity(new BigDecimal("12.3343"), ZonedDateTime.now().minusSeconds(61L));
+        TransactionDto transactionDto = new TransactionDto(new BigDecimal("12.3343"), ZonedDateTime.now().minusSeconds(61L));
 
-        assertThat(subjectUnderTest.checkTransactionTimeOlderThanOneMinute(transactionEntity)).isTrue();
+        assertThat(subjectUnderTest.checkTransactionTimeOlderThanOneMinute(transactionDto)).isTrue();
     }
 /*
     @Test

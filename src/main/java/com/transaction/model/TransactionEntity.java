@@ -1,4 +1,4 @@
-package com.transaction.domain;
+package com.transaction.model;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -1,10 +1,10 @@
 package com.transaction.controller;
 
 import com.fasterxml.jackson.databind.exc.InvalidFormatException;
-import com.transaction.controller.dto.StatisticsDto;
-import com.transaction.controller.dto.TransactionDto;
-import com.transaction.controller.dto.TransactionMapper;
-import com.transaction.domain.TransactionEntity;
+import com.transaction.service.dto.StatisticsDto;
+import com.transaction.service.dto.TransactionDto;
+import com.transaction.service.dto.mapper.TransactionMapper;
+import com.transaction.model.TransactionEntity;
 import com.transaction.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,26 +28,20 @@ public class TransactionController {
     @NonNull
     private final TransactionService transactionService;
 
-    @NonNull
-    private final TransactionMapper transactionMapper;
-
     @Autowired
-    public TransactionController(@NonNull final TransactionService transactionService,
-                                 @NonNull final TransactionMapper transactionMapper) {
+    public TransactionController(@NonNull final TransactionService transactionService) {
         this.transactionService = transactionService;
-        this.transactionMapper = transactionMapper;
     }
 
     @PostMapping("/transactions")
     @ResponseStatus(value = HttpStatus.OK)
     public ResponseEntity<String> postTransaction(@RequestBody @Valid TransactionDto transactionDto) {
-        TransactionEntity incomingTransaction = transactionMapper.dtoToEntity(transactionDto);
-        if (transactionService.checkTransactionTimeInFuture(incomingTransaction)) {
+        if (transactionService.checkTransactionTimeInFuture(transactionDto)) {
             return new ResponseEntity<>("", HttpStatus.UNPROCESSABLE_ENTITY);
-        } else if (transactionService.checkTransactionTimeOlderThanOneMinute(incomingTransaction)) {
+        } else if (transactionService.checkTransactionTimeOlderThanOneMinute(transactionDto)) {
             return new ResponseEntity<>("", HttpStatus.NO_CONTENT);
         } else {
-            transactionService.storeNewTransaction(incomingTransaction);
+            transactionService.storeNewTransaction(transactionDto);
             return new ResponseEntity<>("", HttpStatus.CREATED);
         }
     }

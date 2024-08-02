@@ -1,12 +1,15 @@
 package com.transaction.service;
 
-import com.transaction.controller.dto.StatisticsDto;
-import com.transaction.domain.TransactionEntity;
+import com.transaction.service.dto.StatisticsDto;
+import com.transaction.model.TransactionEntity;
 import com.transaction.repository.TransactionRepository;
+import com.transaction.service.dto.TransactionDto;
+import com.transaction.service.dto.mapper.TransactionMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.NonNull;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -26,22 +29,26 @@ public class TransactionService {
 
     private final TransactionRepository transactionRepository;
 
+    private final TransactionMapper transactionMapper;
+
     @Autowired
-    public TransactionService(TransactionRepository transactionRepository) {
+    public TransactionService(@NonNull final TransactionRepository transactionRepository,
+                              @NonNull final TransactionMapper transactionMapper) {
         this.transactionRepository = transactionRepository;
+        this.transactionMapper = transactionMapper;
     }
 
-    public void storeNewTransaction(TransactionEntity transactionEntity) {
-        log.debug("Received New Transaction {}", transactionEntity.toString());
-        transactionRepository.save(transactionEntity);
+    public void storeNewTransaction(TransactionDto transactionDto) {
+        log.debug("Received New Transaction {}", transactionDto.toString());
+        transactionRepository.save(transactionMapper.dtoToEntity(transactionDto));
     }
 
-    public Boolean checkTransactionTimeInFuture(TransactionEntity transactionEntity) {
-        return transactionEntity.timestamp.isAfter(ZonedDateTime.now());
+    public Boolean checkTransactionTimeInFuture(TransactionDto transactionDto) {
+        return transactionDto.timestamp.isAfter(ZonedDateTime.now());
     }
 
-    public Boolean checkTransactionTimeOlderThanOneMinute(TransactionEntity transactionEntity) {
-        return transactionEntity.timestamp.isBefore(ZonedDateTime.now().minusSeconds(60));
+    public Boolean checkTransactionTimeOlderThanOneMinute(TransactionDto transactionDto) {
+        return transactionDto.timestamp.isBefore(ZonedDateTime.now().minusSeconds(60));
     }
 
     public void clearTransactionStorage() {
@@ -52,8 +59,9 @@ public class TransactionService {
     public StatisticsDto getTransactionstatisticsForLast60Seconds() {
         BigDecimalSummaryStatistics stats = transactionRepository.findAll()
                 .stream()
-                .filter(transactionEntity -> !this.checkTransactionTimeOlderThanOneMinute(transactionEntity))
-                .collect(Collectors2.summarizingBigDecimal(TransactionEntity::getAmount));
+                .map(transactionMapper::entityToDto)
+                .filter(transactionDto -> !this.checkTransactionTimeOlderThanOneMinute(transactionDto))
+                .collect(Collectors2.summarizingBigDecimal(TransactionDto::getAmount));
 
         // The Integration Tests Expect String output for the statistics
         return new StatisticsDto(
