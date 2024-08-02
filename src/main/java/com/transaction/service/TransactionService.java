@@ -1,10 +1,8 @@
 package com.transaction.service;
 
-import com.transaction.api.dto.StatisticsDto;
-import com.transaction.api.dto.TransactionDto;
-import com.transaction.model.TransactionEntity;
+import com.transaction.controller.dto.StatisticsDto;
+import com.transaction.domain.TransactionEntity;
 import com.transaction.repository.TransactionRepository;
-import com.transaction.service.external.AirlineExternalService;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.collections.impl.collector.BigDecimalSummaryStatistics;
 import org.eclipse.collections.impl.collector.Collectors2;

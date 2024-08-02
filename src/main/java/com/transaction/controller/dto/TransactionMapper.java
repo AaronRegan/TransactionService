@@ -1,6 +1,6 @@
-package com.transaction.api.dto;
+package com.transaction.controller.dto;
 
-import com.transaction.model.TransactionEntity;
+import com.transaction.domain.TransactionEntity;
 import org.springframework.stereotype.Component;
 
 @Component

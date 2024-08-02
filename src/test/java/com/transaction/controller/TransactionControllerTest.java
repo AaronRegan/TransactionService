@@ -1,10 +1,10 @@
-package com.transaction.api;
+package com.transaction.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.transaction.Application;
-import com.transaction.api.dto.TransactionDto;
+import com.transaction.controller.dto.TransactionDto;
 import com.transaction.service.TransactionService;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Before;
